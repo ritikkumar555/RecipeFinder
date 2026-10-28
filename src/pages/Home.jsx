@@ -6,18 +6,25 @@ import RecipeCard from '../components/RecipeCard';
 function Home() {
 
   const [recipes, setRecipes] = useState([]);
+  const [total, setTotal] = useState(0);
   
-  async function fetchRecipes() {
+  async function fetchRecipes(skipCount) {
    try {
-    const { data } = await axios.get("https://dummyjson.com/recipes");
+    
+    const { data } = await axios.get(`https://dummyjson.com/recipes?limit=6&skip=${skipCount}`);
     // console.log(data);
-    setRecipes(data.recipes);
-   } catch (error) {} 
+    
+    setRecipes((prev) => [...prev , ...data.recipes]);
+    setTotal(data.total);
+   
+  } catch (error) {
+
+  } 
   }
 
   useEffect(()=>{
     
-    fetchRecipes();
+    fetchRecipes(0);
 
   }, []);
 
@@ -41,15 +48,15 @@ function Home() {
         ))}
       </div>
 
-      {}
-      <div className="text-center mt-8">
+       { recipes.length < total && <div className="text-center mt-8">
         <button
           type="button"
+          onClick={() => fetchRecipes(recipes.length)}
           className="bg-accent hover:bg-accent-hover text-white rounded px-6 py-2 font-medium"
         >
           Load More
         </button>
-      </div>
+      </div>}
 
     </main>
   );
